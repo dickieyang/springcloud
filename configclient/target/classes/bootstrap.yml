@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: config-client
+#  cloud:
+#    config:
+#      uri: http://localhost:9004/
+#      profile: default
+#      label: master
+
+server:
+  port: 9005
+
+#上述配置参数与Git中存储的配置文件中各个部分的对应关系如下：
+#
+#spring.application.name：对应配置文件规则中的{application}部分
+#spring.cloud.config.profile：对应配置文件规则中的{profile}部分
+#spring.cloud.config.label：对应配置文件规则中的{label}部分
+#spring.cloud.config.uri：配置中心config-server的地址
+
+###把config客户端注册到注册中心
+eureka.client.serviceUrl.defaultZone: http://localhost:8888/eureka/
+
+spring.cloud.config.discovery.enabled: true
+spring.cloud.config.discovery.serviceId: config-server
+spring.cloud.config.profile: dev
+spring.cloud.config.failFast: true
+management.security.enabled: false
