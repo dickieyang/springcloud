@@ -8,7 +8,7 @@ spring:
 #      label: master
 
 server:
-  port: 9005
+  port: 9006
 
 #上述配置参数与Git中存储的配置文件中各个部分的对应关系如下：
 #
@@ -16,6 +16,7 @@ server:
 #spring.cloud.config.profile：对应配置文件规则中的{profile}部分
 #spring.cloud.config.label：对应配置文件规则中的{label}部分
 #spring.cloud.config.uri：配置中心config-server的地址
+###若git库的配置发生变化，发送post请求到http://192.168.31.219:9005/refresh即可刷新配置
 
 ###把config客户端注册到注册中心
 eureka.client.serviceUrl.defaultZone: http://localhost:8888/eureka/
@@ -26,3 +27,25 @@ spring.cloud.config.profile: dev
 spring.cloud.config.failFast: true
 ### 关闭认证
 management.security.enabled: false
+hystrix.threadpool.default.coreSize: 10
+
+###通过bus总线更新，选择其中一个服务发送请求即可，http://192.168.31.219:9005/bus/refresh(更新所有服务)
+###指定刷新范围
+### 上面的例子中，我们通过向服务实例请求Spring Cloud Bus的/bus/refresh接口，从而触发总线上其他服务实例的/refresh。
+##但是有些特殊场景下（比如：灰度发布），我们希望可以刷新微服务中某个具体实例的配置。
+### Spring Cloud Bus对这种场景也有很好的支持：/bus/refresh接口还提供了destination参数，用来定位具体要刷新的应用程序。
+##比如，我们可以请求/bus/refresh?destination=customers:9000，此时总线上的各应用实例会根据destination属性的值来判断是否为自己的实例名，
+##若符合才进行配置刷新，若不符合就忽略该消息。
+### destination参数除了可以定位具体的实例之外，还可以用来定位具体的服务。定位服务的原理是通过使用Spring的PathMatecher（路径匹配）来实现，
+##比如：/bus/refresh?destination=customers:**，该请求会触发customers服务的所有实例进行刷新。
+##config rabbitmq
+spring.rabbitmq.host: 192.168.31.42
+spring.rabbitmq.port: 5672
+spring.rabbitmq.username: root
+spring.rabbitmq.password: Chkj2017
+
+###在Config Server中也引入Spring Cloud Bus，将配置服务端也加入到消息总线中来。
+###/bus/refresh请求不在发送到具体服务实例上，而是发送给Config Server，并通过destination参数来指定需要更新配置的服务或实例。
+###通过上面的改动，我们的服务实例就不需要再承担触发配置更新的职责。同时，对于Git的触发等配置都只需要针对Config Server即可，从而简化了集群上的一些维护工作。
+
+##***在在加入总线的情况下，可不加入actuator模块

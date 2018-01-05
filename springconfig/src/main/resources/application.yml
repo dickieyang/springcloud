@@ -13,3 +13,11 @@ server:
 #spring.cloud.config.server.git.password：访问Git仓库的用户密码
 # 配置服务注册中心
 eureka.client.serviceUrl.defaultZone: http://localhost:8888/eureka/
+
+management.security.enabled: false
+
+##config rabbitmq
+spring.rabbitmq.host: 192.168.31.42
+spring.rabbitmq.port: 5672
+spring.rabbitmq.username: root
+spring.rabbitmq.password: Chkj2017

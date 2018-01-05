@@ -17,6 +17,12 @@
         <module>springfeign</module>
         <module>springconfig</module>
         <module>configclient</module>
+        <module>dynamiclogger</module>
+        <module>rabbitmq</module>
+        <module>javamailsenderboot</module>
+        <module>autostarterboot</module>
+        <module>springzuul</module>
+        <module>hystrixdashboard</module>
     </modules>
 
     <properties>
